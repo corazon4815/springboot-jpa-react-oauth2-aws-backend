@@ -35,5 +35,17 @@ public class TodoService {
         return getTodoList(todoEntity.getUserId()); //유저의 모든 todo리스트 반환
     }
 
+    public List<TodoEntity> deleteTodo(final TodoEntity todoEntity) {
+        try {
+            todoRepository.delete(todoEntity);
+        }catch (Exception e){
+            String error = "error deleting entity";
+            log.error(error, todoEntity.getId(), e);
+            throw new RuntimeException(error + todoEntity.getId());
+        }
+        return getTodoList(todoEntity.getUserId()); //유저의 모든 todo리스트 반환
+    }
+
+
 
 }
