@@ -1,9 +1,6 @@
 package com.web.springboot.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Id;
 
@@ -14,7 +11,7 @@ import javax.persistence.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
+@Getter
 @Entity
 @Table(name = "Todo")
 public class TodoEntity {
@@ -28,11 +25,12 @@ public class TodoEntity {
     private String title;
     private boolean done;
 
-    public void setId(String id) {
-        this.id = id;
+    public void changeId(String userId) {this.id = id; }
+    public void changeUserId(String userId) {this.userId = userId; }
+    public void changeTitle(String title) {
+        this.title = title;
     }
-
-    public String getId() {
-        return id;
+    public void changeDone(boolean done) {
+        this.done = done;
     }
 }
