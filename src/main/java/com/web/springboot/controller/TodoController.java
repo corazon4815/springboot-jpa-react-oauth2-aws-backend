@@ -23,8 +23,8 @@ public class TodoController {
         try {
             String userId = "test";
             TodoEntity entity = TodoDTO.toEntity(todoDto);
-            entity.setId(null);
-            entity.setUserId(userId);
+            entity.changeId(null);
+            entity.changeUserId(userId);
             List<TodoEntity> entities = todoService.postTodo(entity);
             //리턴된 엔티티리스트를 TodoDTO 리스트로 반환
             List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
@@ -33,7 +33,6 @@ public class TodoController {
         }catch (Exception e){
             ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(e.getMessage()).build();
             return ResponseEntity.badRequest().body(response);
-
         }
     }
 
@@ -41,6 +40,18 @@ public class TodoController {
     public ResponseEntity<?> getTodoList() {
         String userId = "test";
         List<TodoEntity> entities = todoService.getTodoList(userId); //test 사용자의 todo리스트를 가져온다
+        List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
+        return ResponseEntity.ok().body(response);
+    }
+
+    @PutMapping
+    public ResponseEntity<?> putTodo(@RequestBody TodoDTO todoDto) {
+        String userId = "test";
+        TodoEntity entity = TodoDTO.toEntity(todoDto);
+        entity.changeUserId(userId);
+        List<TodoEntity> entities = todoService.putTodo(entity);
+        //리턴된 엔티티리스트를 TodoDTO 리스트로 반환
         List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
         ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
         return ResponseEntity.ok().body(response);
