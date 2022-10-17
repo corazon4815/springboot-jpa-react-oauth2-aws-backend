@@ -15,8 +15,14 @@ public class TodoService {
     @Autowired
     private TodoRepository todoRepository;
 
-    public List<TodoEntity> create(final TodoEntity todoEntity) {
+    public List<TodoEntity> postTodo(final TodoEntity todoEntity) {
         todoRepository.save(todoEntity);
         return todoRepository.findByUserId(todoEntity.getUserId());
     }
+
+    public List<TodoEntity> getTodoList(final String userId) {
+        return todoRepository.findByUserId(userId);
+    }
+
+
 }
