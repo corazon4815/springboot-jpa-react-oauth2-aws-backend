@@ -1,4 +1,4 @@
-package com.web.springboot.model;
+package com.web.springboot.domain;
 
 import lombok.*;
 import javax.persistence.*;

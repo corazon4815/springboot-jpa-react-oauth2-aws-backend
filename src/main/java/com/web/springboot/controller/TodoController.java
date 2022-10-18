@@ -2,7 +2,7 @@ package com.web.springboot.controller;
 
 import com.web.springboot.dto.ResponseDTO;
 import com.web.springboot.dto.TodoDTO;
-import com.web.springboot.model.TodoEntity;
+import com.web.springboot.domain.TodoEntity;
 import com.web.springboot.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

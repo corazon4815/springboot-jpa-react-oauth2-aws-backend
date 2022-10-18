@@ -1,6 +1,6 @@
 package com.web.springboot.dto;
 
-import com.web.springboot.model.TodoEntity;
+import com.web.springboot.domain.TodoEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
