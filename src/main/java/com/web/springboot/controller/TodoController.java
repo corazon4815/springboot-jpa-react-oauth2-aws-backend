@@ -1,15 +1,10 @@
 package com.web.springboot.controller;
 
-import com.web.springboot.dto.ResponseDTO;
 import com.web.springboot.dto.TodoDTO;
-import com.web.springboot.domain.TodoEntity;
 import com.web.springboot.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("todo")
@@ -18,61 +13,37 @@ public class TodoController {
 
     private final TodoService todoService;
 
+    /*
+     *    투두 저장 후 투두리스트 조회
+     */
     @PostMapping
     public ResponseEntity<?> postTodo(@RequestBody TodoDTO todoDto) {
-        try {
-            String userId = "test";
-            TodoEntity entity = TodoDTO.toEntity(todoDto);
-            entity.changeId(null);
-            entity.changeUserId(userId);
-            List<TodoEntity> entities = todoService.postTodo(entity);
-            //리턴된 엔티티리스트를 TodoDTO 리스트로 반환
-            List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
-            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
-            return ResponseEntity.ok().body(response);
-        }catch (Exception e){
-            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(e.getMessage()).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+        return ResponseEntity.ok().body(todoService.postTodo(todoDto));
     }
 
+    /*
+     *    투두 리스트 조회
+     */
     @GetMapping
     public ResponseEntity<?> getTodoList() {
         String userId = "test";
-        List<TodoEntity> entities = todoService.getTodoList(userId); //test 사용자의 todo리스트를 가져온다
-        List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
-        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(todoService.getTodoList(userId));
     }
 
+    /*
+     *    투두 수정
+     */
     @PutMapping
     public ResponseEntity<?> putTodo(@RequestBody TodoDTO todoDto) {
-        String userId = "test";
-        TodoEntity entity = TodoDTO.toEntity(todoDto);
-        entity.changeUserId(userId);
-        List<TodoEntity> entities = todoService.putTodo(entity);
-        //리턴된 엔티티리스트를 TodoDTO 리스트로 반환
-        List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
-        ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok().body(todoService.putTodo(todoDto));
     }
 
+    /*
+     *    투두 삭제
+     */
     @DeleteMapping
-    public ResponseEntity<?> deleteTodo(@RequestBody TodoDTO todoDto) {
-        try {
-            String userId = "test";
-            TodoEntity entity = TodoDTO.toEntity(todoDto);
-            entity.changeUserId(userId);
-            List<TodoEntity> entities = todoService.deleteTodo(entity);
-            //리턴된 엔티티리스트를 TodoDTO 리스트로 반환
-            List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
-            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().data(dtos).build();
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e){
-            String error = e.getMessage();
-            ResponseDTO<TodoDTO> response = ResponseDTO.<TodoDTO>builder().error(error).build();
-            return ResponseEntity.badRequest().body(response);
-        }
+    public ResponseEntity<?> deleteTodo(@RequestParam Long id) {
+        return ResponseEntity.ok().body(todoService.deleteTodo(id));
     }
 
 
