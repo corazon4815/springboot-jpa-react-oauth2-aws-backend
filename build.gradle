@@ -23,6 +23,8 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'junit:junit:4.12'
+	implementation 'mysql:mysql-connector-java'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -32,6 +34,7 @@ dependencies {
 	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+tasks.withType(Test) {
+	scanForTestClasses = false
+	include "**/*Test.class" // whatever Ant pattern matches your test class files
 }
