@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Getter
 @Entity
 @Table(name = "Todo")
-public class TodoEntity {
+public class TodoEntity extends BaseTimeEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) //auto increment
     private Long id;

@@ -29,10 +29,7 @@ public class TodoService {
         entity.changeUserId(userId);
         todoRepository.save(entity);
 
-        //로그인 사용자의 투두리스트 조회
-        List<TodoEntity> entities = todoRepository.findByUserId(entity.getUserId());
-        List<TodoDTO> dtos = entities.stream().map(TodoDTO::new).collect(Collectors.toList());
-        return ResponseDTO.<TodoDTO>builder().data(dtos).build();
+        return getTodoList(userId);
     }
 
     /*
