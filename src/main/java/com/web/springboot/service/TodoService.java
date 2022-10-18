@@ -37,7 +37,7 @@ public class TodoService {
 
     public List<TodoEntity> deleteTodo(final TodoEntity todoEntity) {
         try {
-            todoRepository.delete(todoEntity);
+            todoRepository.deleteById(todoEntity.getId());
         }catch (Exception e){
             String error = "error deleting entity";
             log.error(error, todoEntity.getId(), e);
