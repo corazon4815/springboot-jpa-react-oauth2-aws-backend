@@ -4,7 +4,7 @@ import com.web.springboot.dto.ResponseDTO;
 import com.web.springboot.dto.TodoDTO;
 import com.web.springboot.model.TodoEntity;
 import com.web.springboot.service.TodoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("todo")
+@RequiredArgsConstructor
 public class TodoController {
 
-    @Autowired
-    private TodoService todoService;
+    private final TodoService todoService;
 
     @PostMapping
     public ResponseEntity<?> postTodo(@RequestBody TodoDTO todoDto) {

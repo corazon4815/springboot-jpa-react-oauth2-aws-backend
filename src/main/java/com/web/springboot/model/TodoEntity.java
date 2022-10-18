@@ -25,7 +25,7 @@ public class TodoEntity {
     private String title;
     private boolean done;
 
-    public void changeId(String userId) {this.id = id; }
+    public void changeId(String id) {this.id = id; }
     public void changeUserId(String userId) {this.userId = userId; }
     public void changeTitle(String title) {
         this.title = title;

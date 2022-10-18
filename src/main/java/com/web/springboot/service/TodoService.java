@@ -2,8 +2,8 @@ package com.web.springboot.service;
 
 import com.web.springboot.model.TodoEntity;
 import com.web.springboot.persistence.TodoRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,10 +11,10 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TodoService {
 
-    @Autowired
-    private TodoRepository todoRepository;
+    private final TodoRepository todoRepository;
 
     public List<TodoEntity> postTodo(final TodoEntity todoEntity) {
         todoRepository.save(todoEntity);
