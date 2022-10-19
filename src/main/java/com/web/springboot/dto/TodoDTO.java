@@ -5,9 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
 import java.time.LocalDateTime;
 
 @Builder
@@ -15,10 +12,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 public class TodoDTO {
+
     private Long id;
+
     private String title;
+
     private boolean done;
+
     private LocalDateTime createdDate;
+
     private LocalDateTime modifiedDate;
 
     public TodoDTO(final TodoEntity entity) {

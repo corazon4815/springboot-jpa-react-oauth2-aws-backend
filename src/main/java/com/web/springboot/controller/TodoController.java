@@ -1,13 +1,16 @@
 package com.web.springboot.controller;
 
+import com.web.springboot.common.dto.ResponseDTO;
 import com.web.springboot.dto.TodoDTO;
 import com.web.springboot.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
-@RequestMapping("todo")
+@RequestMapping("/todo")
 @RequiredArgsConstructor
 public class TodoController {
 
@@ -18,7 +21,8 @@ public class TodoController {
      */
     @PostMapping
     public ResponseEntity<?> postTodo(@RequestBody TodoDTO todoDto) {
-        return ResponseEntity.ok().body(todoService.postTodo(todoDto));
+        todoService.postTodo(todoDto);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 등록 성공", null), HttpStatus.CREATED);
     }
 
     /*
@@ -27,7 +31,8 @@ public class TodoController {
     @GetMapping
     public ResponseEntity<?> getTodoList() {
         String userId = "test";
-        return ResponseEntity.ok().body(todoService.getTodoList(userId));
+        List<TodoDTO> todoList = todoService.getTodoList(userId);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 리스트 조회 성공", todoList), HttpStatus.OK);
     }
 
     /*
@@ -35,15 +40,17 @@ public class TodoController {
      */
     @PutMapping
     public ResponseEntity<?> putTodo(@RequestBody TodoDTO todoDto) {
-        return ResponseEntity.ok().body(todoService.putTodo(todoDto));
+        todoService.putTodo(todoDto);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 수정 성공", null), HttpStatus.OK);
     }
 
     /*
      *    투두 삭제
      */
-    @DeleteMapping
-    public ResponseEntity<?> deleteTodo(@RequestParam Long id) {
-        return ResponseEntity.ok().body(todoService.deleteTodo(id));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteTodo(@PathVariable("id") Long id) {
+        todoService.deleteTodo(id);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 삭제 성공", null), HttpStatus.OK);
     }
 
 
