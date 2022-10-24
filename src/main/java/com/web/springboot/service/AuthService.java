@@ -8,15 +8,10 @@ import com.web.springboot.dto.UserDTO;
 import com.web.springboot.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,42 +40,44 @@ public class AuthService {
                     .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
-            final String email = userEntity.getEmail();
-            if (userEntity == null || userEntity.getEmail() == null || userRepository.existsByEmail(email)) {
-                throw new CustomException();
-            }
             userRepository.save(userEntity);
         } catch (Exception e) {
-            throw new CustomException();
+            throw new CustomException(e);
         }
     }
 
     /*
      *    회원 로그인
      */
-    public UserDTO authenticate(HttpServletResponse response, UserDTO userDTO) {
-        final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
+    @Transactional(readOnly = true)
+    public UserDTO authenticate(HttpServletResponse response, UserDTO userDTO) throws CustomException {
+        try {
+            final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
 
-        if (originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
+            if (originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
 
-            makeToken(response, originalUser.getId());
+                makeToken(response, originalUser.getId());
 
-            final UserDTO responseUserDTO = UserDTO.builder()
-                    .id(originalUser.getId())
-                    .email(originalUser.getEmail())
-                    .username(originalUser.getUsername())
-                    .build();
-            return responseUserDTO;
-        } else {
-            log.warn("로그인에 실패하였습니다.", userDTO.getEmail());
-            throw new CustomException("로그인에 실패하였습니다.");
+                final UserDTO responseUserDTO = UserDTO.builder()
+                        .id(originalUser.getId())
+                        .email(originalUser.getEmail())
+                        .username(originalUser.getUsername())
+                        .build();
+                return responseUserDTO;
+            } else {
+                log.warn("로그인에 실패하였습니다.", userDTO.getEmail());
+                throw new CustomException("로그인에 실패하였습니다.");
+            }
+        } catch (Exception e) {
+            throw new CustomException(e);
         }
     }
 
     /*
      *    토큰 재발급
      */
-    public void reCreateToken(HttpServletRequest request, HttpServletResponse response) {
+    @Transactional(rollbackFor = {Error.class})
+    public void reCreateToken(HttpServletRequest request, HttpServletResponse response) throws CustomException {
         try {
             Cookie refreshCookie = jwtProvider.getCookie(request, jwtProvider.REFRESH_TOKEN_NAME);
             String refreshToken = refreshCookie.getValue();
@@ -91,21 +88,22 @@ public class AuthService {
             //redis 에 등록된 refreshToken 가져오기
             String findRefreshToken = redisService.getValues(userId);
 
-            if(findRefreshToken == null || refreshToken == null || !findRefreshToken.equals(refreshToken)){
+            if (findRefreshToken == null || refreshToken == null || !findRefreshToken.equals(refreshToken)) {
                 throw new Exception();
             }
 
             makeToken(response, userId);
 
         } catch (Exception e) {
-            throw new CustomException(e.getMessage());
+            throw new CustomException(e);
         }
     }
 
     /*
      *    access, refesh토큰을 생성해서 쿠키에 넣고 refresh 토큰은 redis에 넣어준다..
      */
-    public void makeToken(HttpServletResponse response, String userId) {
+    @Transactional(rollbackFor = {Error.class})
+    public void makeToken(HttpServletResponse response, String userId) throws CustomException {
         try {
             //accessToken, refreshToken 생성
             String newAccessToken = jwtProvider.createToken(userId, jwtProvider.TOKEN_VALIDATION_SECOND);
@@ -118,7 +116,7 @@ public class AuthService {
             jwtProvider.createCookie(newAccessToken, response, jwtProvider.ACCESS_TOKEN_NAME, jwtProvider.TOKEN_VALIDATION_SECOND);
             jwtProvider.createCookie(newRefreshToken, response, jwtProvider.REFRESH_TOKEN_NAME, jwtProvider.REFRESH_TOKEN_VALIDATION_SECOND);
         } catch (Exception e) {
-            throw new CustomException(e.getMessage());
+            throw new CustomException(e);
         }
     }
 

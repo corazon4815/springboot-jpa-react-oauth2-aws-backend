@@ -1,5 +1,8 @@
 package com.web.springboot.common.exception;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class CustomException extends RuntimeException {
 
     private static final long serialVersionUID=1L;
@@ -8,7 +11,7 @@ public class CustomException extends RuntimeException {
         super(message);
     }
 
-    public CustomException() {
-
+    public CustomException(Exception e) {
+        super(e.getMessage());
     }
 }

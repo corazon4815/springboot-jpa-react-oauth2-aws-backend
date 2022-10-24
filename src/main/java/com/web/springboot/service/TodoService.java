@@ -6,7 +6,6 @@ import com.web.springboot.domain.TodoRepository;
 import com.web.springboot.dto.TodoDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.sql.SQLException;
@@ -25,43 +24,54 @@ public class TodoService {
      *    투두 저장
      */
     @Transactional(rollbackFor = {SQLException.class, Error.class})
-    public void postTodo(TodoDTO todoDto) {
-        TodoEntity entity = TodoDTO.toEntity(todoDto);
-        entity.changeId(null);
-        entity.changeUserId(userId);
-        todoRepository.save(entity);
+    public void postTodo(TodoDTO todoDto) throws CustomException {
+        try {
+            TodoEntity entity = TodoDTO.toEntity(todoDto);
+            entity.changeId(null);
+            entity.changeUserId(userId);
+            todoRepository.save(entity);
+        } catch (Exception e) {
+            throw new CustomException(e);
+        }
     }
 
     /*
      *    투두 리스트 조회
      */
     @Transactional(readOnly = true)
-    public List<TodoDTO> getTodoList(String userId) {
-        List<TodoEntity> entities = todoRepository.findByUserId(userId);
-        return entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+    public List<TodoDTO> getTodoList(String userId) throws CustomException {
+        try {
+            List<TodoEntity> entities = todoRepository.findByUserId(userId);
+            return entities.stream().map(TodoDTO::new).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException(e);
+        }
     }
 
     /*
      *    투두 수정
      */
     @Transactional(rollbackFor = {SQLException.class, Error.class})
-    public void putTodo(TodoDTO todoDto) {
-        TodoEntity todoEntity = todoRepository.findById(todoDto.getId())
-                .orElseThrow(() -> new CustomException("해당 투두가 없습니다."));
-
-        todoEntity.changeTitle(todoDto.getTitle());
-        todoEntity.changeDone(todoDto.isDone());
+    public void putTodo(TodoDTO todoDto) throws CustomException {
+        try {
+            TodoEntity todoEntity = todoRepository.findById(todoDto.getId())
+                    .orElseThrow(() -> new CustomException("해당 투두가 없습니다."));
+            todoEntity.changeTitle(todoDto.getTitle());
+            todoEntity.changeDone(todoDto.isDone());
+        } catch (Exception e) {
+            throw new CustomException(e);
+        }
     }
 
     /*
      *    투두 삭제
      */
     @Transactional(rollbackFor = {SQLException.class, Error.class})
-    public void deleteTodo(Long id) {
+    public void deleteTodo(Long id) throws CustomException {
         try {
             todoRepository.deleteById(id);
-        }catch (EmptyResultDataAccessException e){
-            throw new CustomException("해당 투두가 없습니다.");
+        } catch (Exception e) {
+            throw new CustomException(e);
         }
     }
 }
