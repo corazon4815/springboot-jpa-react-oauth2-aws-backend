@@ -1,8 +1,6 @@
 package com.web.springboot.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.Cookie;
@@ -47,7 +45,6 @@ public class JwtProvider {
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
         response.addCookie(cookie);
-        System.out.println(cookie);
         return cookie;
     }
 
@@ -78,4 +75,5 @@ public class JwtProvider {
                 .getBody();
         return claims.getSubject();
     }
+
 }

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -30,8 +32,8 @@ public class AuthController {
         try {
             authService.postUser(userDTO);
             return new ResponseEntity<>(new ResponseDTO<>(1, "회원 등록 성공", null), HttpStatus.CREATED);
-        }catch (CustomException e){
-            throw new CustomException("회원등록에 실패하였습니다.");
+        } catch (CustomException e) {
+            throw new CustomException("회원등록 실패");
         }
     }
 
@@ -40,8 +42,22 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(HttpServletResponse response, @RequestBody UserDTO userDTO) {
-    return new ResponseEntity<>(new ResponseDTO<>(1, "로그인 성공", authService.authenticate(response, userDTO)), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "로그인 성공", authService.authenticate(response, userDTO)), HttpStatus.OK);
     }
+
+    /*
+     *    토큰 재발급
+     */
+    @PostMapping("/recreate")
+    public ResponseEntity<?> reCreateToken(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            authService.reCreateToken(request, response);
+            return new ResponseEntity<>(new ResponseDTO<>(1, "토큰 재발급 성공", null), HttpStatus.OK);
+        } catch (CustomException e) {
+            throw new CustomException(e.getMessage());
+        }
+    }
+
 
     //아이디 중복 체크 메소드
 }

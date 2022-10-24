@@ -1,5 +1,6 @@
 package com.web.springboot.security;
 
+import com.web.springboot.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,13 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Cookie cookie = jwtProvider.getCookie(request, JwtProvider.ACCESS_TOKEN_NAME);
-            String accessToken = cookie.getValue();
+            Cookie accessCookie = jwtProvider.getCookie(request, JwtProvider.ACCESS_TOKEN_NAME);
+            String accessToken = accessCookie.getValue();
             log.info("Filter is running...");
             if (accessToken != null && !accessToken.equalsIgnoreCase("null")) {
                 // userId 가져오기. 위조 된 경우 예외 처리 된다.
                 String userId = jwtProvider.validateAndGetUserId(accessToken);
-                log.info("Authenticated user ID : " + userId);
+
                 // 인증 완료; SecurityContextHolder에 등록해야 인증된 사용자라고 생각한다.
                 AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userId, // 인증된 사용자의 정보. 문자열이 아니어도 아무거나 넣을 수 있다.
