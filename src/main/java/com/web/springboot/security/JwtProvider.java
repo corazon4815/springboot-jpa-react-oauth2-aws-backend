@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -30,23 +29,36 @@ public class JwtProvider {
     /*
      * JWT를 생성한다
      */
-    public String createToken(UserEntity userEntity) {
+    public String createToken(String id) {
         return Jwts.builder()
                 // header에 들어갈 내용 및 서명을 하기 위한 SECRET_KEY
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 // payload에 들어갈 내용
-                .setSubject(userEntity.getId()) // sub
+                .setSubject(id) // sub
                 .setIssuedAt(new Date()) // iat
-                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS))) // exp
+                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(accessTokenExpire).toInstant())) // exp
+                .compact();
+    }
+
+    /*
+     * refreshToken을 생성한다
+     */
+    public String createRefreshToken(String id) {
+        return Jwts.builder()
+                // header에 들어갈 내용 및 서명을 하기 위한 SECRET_KEY
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                // payload에 들어갈 내용
+                .setSubject(id) // sub
+                .setIssuedAt(new Date()) // iat
+                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(refreshTokenExpire).toInstant())) // exp
                 .compact();
     }
 
     /*
      * 쿠키를 생성한다
      */
-    public Cookie createCookie(UserEntity userEntity, HttpServletResponse response, String cookieName, int maxAge) {
-        String jwt = createToken(userEntity);
-        Cookie cookie = new Cookie(cookieName, jwt);
+    public Cookie createCookie(String token, HttpServletResponse response, String cookieName, int maxAge) {
+        Cookie cookie = new Cookie(cookieName, token);
         cookie.setHttpOnly(true);
 //        cookie.setSecure(true); //추후 주석없애기
         cookie.setMaxAge(maxAge);

@@ -1,6 +1,7 @@
 package com.web.springboot.service;
 
 import com.web.springboot.common.exception.CustomException;
+import com.web.springboot.common.redis.RedisService;
 import com.web.springboot.domain.UserEntity;
 import com.web.springboot.domain.UserRepository;
 import com.web.springboot.dto.UserDTO;
@@ -20,8 +21,10 @@ import java.sql.SQLException;
 public class AuthService {
 
     private final UserRepository userRepository;
-	private final JwtProvider JWTProvider;
+	private final JwtProvider JwtProvider;
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+    private final RedisService redisService;
 
     /*
      *    회원 등록
@@ -53,7 +56,15 @@ public class AuthService {
 
         if(originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
             //jwt cookie 생성
-            JWTProvider.createCookie(originalUser, response, JWTProvider.accessTokenName, JWTProvider.accessTokenExpire);
+            String accessToken = JwtProvider.createToken(originalUser.getId());
+            String refreshToken = JwtProvider.createRefreshToken(originalUser.getId());
+
+            redisService.setValues(originalUser.getId(), refreshToken);
+
+            //쿠키 생성
+            JwtProvider.createCookie(accessToken, response, JwtProvider.accessTokenName, JwtProvider.accessTokenExpire);
+            JwtProvider.createCookie(refreshToken, response, JwtProvider.refreshTokenName, JwtProvider.refreshTokenExpire);
+
             final UserDTO responseUserDTO = UserDTO.builder()
                     .id(originalUser.getId())
                     .email(originalUser.getEmail())
