@@ -16,6 +16,6 @@ public class ResponseDTO<T> {
 
     private String message;
 
-    private List<T> data;
+    private T data;
 
 }
