@@ -56,14 +56,14 @@ public class AuthService {
 
         if(originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
             //jwt cookie 생성
-            String accessToken = JwtProvider.createToken(originalUser.getId());
-            String refreshToken = JwtProvider.createRefreshToken(originalUser.getId());
+            String accessToken = JwtProvider.createToken(originalUser.getId(), JwtProvider.TOKEN_VALIDATION_SECOND);
+            String refreshToken = JwtProvider.createToken(originalUser.getId(), JwtProvider.REFRESH_TOKEN_VALIDATION_SECOND);
 
             redisService.setValues(originalUser.getId(), refreshToken);
 
             //쿠키 생성
-            JwtProvider.createCookie(accessToken, response, JwtProvider.accessTokenName, JwtProvider.accessTokenExpire);
-            JwtProvider.createCookie(refreshToken, response, JwtProvider.refreshTokenName, JwtProvider.refreshTokenExpire);
+            JwtProvider.createCookie(accessToken, response, JwtProvider.ACCESS_TOKEN_NAME, JwtProvider.TOKEN_VALIDATION_SECOND);
+            JwtProvider.createCookie(refreshToken, response, JwtProvider.REFRESH_TOKEN_NAME, JwtProvider.REFRESH_TOKEN_VALIDATION_SECOND);
 
             final UserDTO responseUserDTO = UserDTO.builder()
                     .id(originalUser.getId())

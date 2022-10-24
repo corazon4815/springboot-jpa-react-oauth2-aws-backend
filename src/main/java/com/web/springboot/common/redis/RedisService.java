@@ -19,7 +19,7 @@ public class RedisService {
      */
     public void setValues(String id, String refreshToken){
         ValueOperations<String, String> values = redisTemplate.opsForValue();
-        values.set(id, refreshToken, Duration.ofMinutes(jwtProvider.refreshTokenExpire));  // 2주뒤 메모리에서 삭제된다.
+        values.set(id, refreshToken, Duration.ofMinutes(jwtProvider.REFRESH_TOKEN_VALIDATION_SECOND));  // 1주뒤 메모리에서 삭제된다.
     }
 
     /**

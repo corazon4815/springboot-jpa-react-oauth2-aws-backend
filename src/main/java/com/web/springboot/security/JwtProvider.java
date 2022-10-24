@@ -1,16 +1,13 @@
 package com.web.springboot.security;
 
-import com.web.springboot.domain.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Slf4j
@@ -18,39 +15,25 @@ import java.util.Date;
 public class JwtProvider {
     private static final String SECRET_KEY = "fddsfdFSDFSDFf3434SDFSDF";
 
-    public final static int accessTokenExpire = 60 * 30;
+    public final static int TOKEN_VALIDATION_SECOND = 60 * 15; //15분
 
-    public final static int refreshTokenExpire = 20160;
+    public final static int REFRESH_TOKEN_VALIDATION_SECOND = 7 * 24 * 60 * 60; //일주일
 
-    public final static String accessTokenName = "accessToken";
+    public final static String ACCESS_TOKEN_NAME = "accessToken";
 
-    public final static String refreshTokenName = "refreshToken";
+    public final static String REFRESH_TOKEN_NAME = "refreshToken";
 
     /*
      * JWT를 생성한다
      */
-    public String createToken(String id) {
+    public String createToken(String id, long expireTime) {
         return Jwts.builder()
                 // header에 들어갈 내용 및 서명을 하기 위한 SECRET_KEY
                 .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
                 // payload에 들어갈 내용
                 .setSubject(id) // sub
                 .setIssuedAt(new Date()) // iat
-                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(accessTokenExpire).toInstant())) // exp
-                .compact();
-    }
-
-    /*
-     * refreshToken을 생성한다
-     */
-    public String createRefreshToken(String id) {
-        return Jwts.builder()
-                // header에 들어갈 내용 및 서명을 하기 위한 SECRET_KEY
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                // payload에 들어갈 내용
-                .setSubject(id) // sub
-                .setIssuedAt(new Date()) // iat
-                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(refreshTokenExpire).toInstant())) // exp
+                .setExpiration(new Date(System.currentTimeMillis() + expireTime * 1000)) // exp
                 .compact();
     }
 
@@ -63,8 +46,8 @@ public class JwtProvider {
 //        cookie.setSecure(true); //추후 주석없애기
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
-
         response.addCookie(cookie);
+        System.out.println(cookie);
         return cookie;
     }
 
@@ -95,14 +78,4 @@ public class JwtProvider {
                 .getBody();
         return claims.getSubject();
     }
-
-    /*
-     * token에서 Bearer제외하고 jwt를 리턴한다
-     */
-//    public String parseBearerToken(String accessToken) {
-//		if (StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")) {
-//			return accessToken.substring(7);
-//		}
-//		return null;
-//	}
 }
