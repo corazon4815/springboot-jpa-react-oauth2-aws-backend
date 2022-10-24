@@ -1,5 +1,6 @@
 package com.web.springboot.security;
 
+import com.web.springboot.common.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -30,7 +31,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			// 리퀘스트에서 토큰 가져오기.
 			String token = parseBearerToken(request);
 			log.info("Filter is running...");
-			// 토큰 검사하기. JWT이므로 인가 서버에 요청 하지 않고도 검증 가능.
 			if (token != null && !token.equalsIgnoreCase("null")) {
 				// userId 가져오기. 위조 된 경우 예외 처리 된다.
 				String userId = tokenProvider.validateAndGetUserId(token);
@@ -49,7 +49,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		} catch (Exception ex) {
 			logger.error("Could not set user authentication in security context", ex);
 		}
-
 		filterChain.doFilter(request, response);
 	}
 

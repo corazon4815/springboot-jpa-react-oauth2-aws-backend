@@ -1,7 +1,6 @@
 package com.web.springboot.config;
 
 import com.web.springboot.security.JwtAuthenticationFilter;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,8 +13,12 @@ import org.springframework.web.filter.CorsFilter;
 @Slf4j
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -26,7 +29,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // session 기반이 아님을 선언
                 .and()
-                .authorizeRequests().antMatchers("/", "/auth/**","/user/signup/**").permitAll() // /와 /auth/** 경로는 인증 안해도 됨.
+                .authorizeRequests().antMatchers("/", "/auth/**").permitAll() // /와 /auth/** 경로는 인증 안해도 됨.
                 .anyRequest().authenticated(); // /와 /auth/**이외의 모든 경로는 인증 해야됨.
 
         // filter 등록.
