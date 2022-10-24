@@ -4,13 +4,14 @@ import com.web.springboot.common.exception.CustomException;
 import com.web.springboot.domain.UserEntity;
 import com.web.springboot.domain.UserRepository;
 import com.web.springboot.dto.UserDTO;
-import com.web.springboot.security.TokenProvider;
+import com.web.springboot.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 
 @Slf4j
@@ -19,32 +20,11 @@ import java.sql.SQLException;
 public class AuthService {
 
     private final UserRepository userRepository;
-	private final TokenProvider tokenProvider;
+	private final JwtProvider JWTProvider;
 	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     /*
      *    회원 등록
-     */
-    public UserDTO authenticate(UserDTO userDTO) {
-        final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
-        if(originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
-
-            // 토큰 생성
-            final String token = tokenProvider.createToken(originalUser);
-            final UserDTO responseUserDTO = UserDTO.builder()
-                    .email(originalUser.getUsername())
-                    .id(originalUser.getId())
-                    .token(token)
-                    .build();
-            return responseUserDTO;
-		} else {
-          log.warn("로그인에 실패하였습니다.", userDTO.getEmail() );
-                throw new CustomException("로그인에 실패하였습니다.");
-        }
-    }
-
-    /*
-     *    회원 로그인
      */
     @Transactional(rollbackFor = {SQLException.class, Error.class})
     public void postUser(final UserDTO userDTO) throws CustomException {
@@ -62,6 +42,27 @@ public class AuthService {
             userRepository.save(userEntity);
         } catch (Exception e) {
             throw new CustomException();
+        }
+    }
+
+    /*
+     *    회원 로그인
+     */
+    public UserDTO authenticate(HttpServletResponse response, UserDTO userDTO) {
+        final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
+
+        if(originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
+            //jwt cookie 생성
+            JWTProvider.createCookie(originalUser, response, JWTProvider.accessTokenName, JWTProvider.accessTokenExpire);
+            final UserDTO responseUserDTO = UserDTO.builder()
+                    .id(originalUser.getId())
+                    .email(originalUser.getEmail())
+                    .username(originalUser.getUsername())
+                    .build();
+            return responseUserDTO;
+		} else {
+          log.warn("로그인에 실패하였습니다.", userDTO.getEmail() );
+                throw new CustomException("로그인에 실패하였습니다.");
         }
     }
 

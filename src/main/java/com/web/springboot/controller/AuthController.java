@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RestController
@@ -38,8 +39,8 @@ public class AuthController {
      *    회원 로그인
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDTO userDTO) {
-    return new ResponseEntity<>(new ResponseDTO<>(1, "로그인 성공", authService.authenticate(userDTO)), HttpStatus.CREATED);
+    public ResponseEntity<?> login(HttpServletResponse response, @RequestBody UserDTO userDTO) {
+    return new ResponseEntity<>(new ResponseDTO<>(1, "로그인 성공", authService.authenticate(response, userDTO)), HttpStatus.OK);
     }
 
     //아이디 중복 체크 메소드
