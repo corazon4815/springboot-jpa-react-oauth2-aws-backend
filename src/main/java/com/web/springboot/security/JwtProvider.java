@@ -38,21 +38,20 @@ public class JwtProvider {
     /*
      * 쿠키를 생성한다
      */
-    public Cookie createCookie(String token, HttpServletResponse response, String cookieName, int maxAge) {
+    public void createCookie(String token, HttpServletResponse response, String cookieName, int maxAge) {
         Cookie cookie = new Cookie(cookieName, token);
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true); //추후 주석없애기
+        cookie.setSecure(true);
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
         response.addCookie(cookie);
-        return cookie;
     }
 
     /*
      * 쿠키를 가져온다
      */
-    public Cookie getCookie(HttpServletRequest req, String cookieName) {
-        final Cookie[] cookies = req.getCookies();
+    public Cookie getCookie(HttpServletRequest request, String cookieName) {
+        final Cookie[] cookies = request.getCookies();
         if (cookies == null) return null;
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(cookieName))

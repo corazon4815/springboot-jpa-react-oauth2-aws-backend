@@ -25,7 +25,6 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     private final RedisService redisService;
 
     /*
@@ -36,7 +35,7 @@ public class AuthService {
         try {
             UserEntity userEntity = UserEntity.builder()
                     .email(userDTO.getEmail())
-                    .username(userDTO.getUsername())
+                    //.username(userDTO.getUsername())
                     .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
@@ -49,7 +48,7 @@ public class AuthService {
     /*
      *    회원 로그인
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public UserDTO authenticate(HttpServletResponse response, UserDTO userDTO) throws CustomException {
         try {
             final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
@@ -100,7 +99,7 @@ public class AuthService {
     }
 
     /*
-     *    access, refesh토큰을 생성해서 쿠키에 넣고 refresh 토큰은 redis에 넣어준다..
+     *    access, refesh토큰을 생성해서 쿠키에 넣고 refresh 토큰은 redis에 넣어준다.
      */
     @Transactional(rollbackFor = {Error.class})
     public void makeToken(HttpServletResponse response, String userId) throws CustomException {
