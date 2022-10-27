@@ -35,7 +35,7 @@ public class AuthService {
         try {
             UserEntity userEntity = UserEntity.builder()
                     .email(userDTO.getEmail())
-                    //.username(userDTO.getUsername())
+                    .username(userDTO.getUsername())
                     .password(passwordEncoder.encode(userDTO.getPassword()))
                     .build();
 
@@ -52,11 +52,8 @@ public class AuthService {
     public UserDTO authenticate(HttpServletResponse response, UserDTO userDTO) throws CustomException {
         try {
             final UserEntity originalUser = userRepository.findByEmail(userDTO.getEmail());
-
             if (originalUser != null && passwordEncoder.matches(userDTO.getPassword(), originalUser.getPassword())) {
-
                 makeToken(response, originalUser.getId());
-
                 final UserDTO responseUserDTO = UserDTO.builder()
                         .id(originalUser.getId())
                         .email(originalUser.getEmail())
@@ -88,7 +85,7 @@ public class AuthService {
             String findRefreshToken = redisService.getValues(userId);
 
             if (findRefreshToken == null || refreshToken == null || !findRefreshToken.equals(refreshToken)) {
-                throw new Exception();
+                throw new CustomException();
             }
 
             makeToken(response, userId);
