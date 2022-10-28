@@ -2,6 +2,7 @@ package com.web.springboot.security;
 
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -11,9 +12,11 @@ import java.util.Date;
 @Slf4j
 @Service
 public class JwtProvider {
-    private static final String SECRET_KEY = "fddsfdFSDFSDFf3434SDFSDF";
 
-    public final static int TOKEN_VALIDATION_SECOND = 60 * 15; //15분
+    @Value("${jwt.secret}")
+    private String SECRET_KEY;
+
+    public final static int TOKEN_VALIDATION_SECOND = 15; //15분 60 * 15
 
     public final static int REFRESH_TOKEN_VALIDATION_SECOND = 7 * 24 * 60 * 60; //일주일
 
@@ -63,11 +66,11 @@ public class JwtProvider {
     /*
      * 쿠키를 검증한다
      */
-    public String validateAndGetUserId(String token) {
+    public String validateAndGetId(String token) {
         // parseClaimsJws메서드가 Base 64로 디코딩 및 파싱.
         // 즉, 헤더와 페이로드를 setSigningKey로 넘어온 시크릿을 이용 해 서명 후, token의 서명과 비교.
         // 위조되지 않았다면 페이로드(Claims) 리턴
-        // 그 중 우리는 userId가 필요하므로 getBody를 부른다.
+        // 그 중 우리는 id가 필요하므로 getBody를 부른다.
         Claims claims = Jwts.parser()
                 .setSigningKey(SECRET_KEY)
                 .parseClaimsJws(token)
