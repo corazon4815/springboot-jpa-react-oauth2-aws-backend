@@ -79,16 +79,16 @@ public class AuthService {
             String refreshToken = refreshCookie.getValue();
 
             //refreshToken 검증
-            String userId = jwtProvider.validateAndGetUserId(refreshToken);
+            String id = jwtProvider.validateAndGetId(refreshToken);
 
             //redis 에 등록된 refreshToken 가져오기
-            String findRefreshToken = redisService.getValues(userId);
+            String findRefreshToken = redisService.getValues(id);
 
             if (findRefreshToken == null || refreshToken == null || !findRefreshToken.equals(refreshToken)) {
                 throw new CustomException();
             }
 
-            makeToken(response, userId);
+            makeToken(response, id);
 
         } catch (Exception e) {
             throw new CustomException(e);

@@ -7,6 +7,7 @@ import com.web.springboot.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,20 +19,19 @@ public class TodoController {
     private final TodoService todoService;
 
     /*
-     *    투두 저장 후 투두리스트 조회
+     *    투두 저장
      */
     @PostMapping
-    public ResponseEntity<?> postTodo(@RequestBody TodoDTO todoDto) throws CustomException {
-        todoService.postTodo(todoDto);
-        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 등록 성공", null), HttpStatus.CREATED);
+    public ResponseEntity<?> postTodo(@AuthenticationPrincipal String userId, @RequestBody TodoDTO todoDto) throws CustomException {
+        todoService.postTodo(userId, todoDto);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "todo 등록 성공", null), HttpStatus.OK);
     }
 
     /*
      *    투두 리스트 조회
      */
     @GetMapping
-    public ResponseEntity<?> getTodoList() throws CustomException {
-        String userId = "test";
+    public ResponseEntity<?> getTodoList(@AuthenticationPrincipal String userId) throws CustomException {
         List<TodoDTO> todoList = todoService.getTodoList(userId);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 리스트 조회 성공", todoList), HttpStatus.OK);
     }
@@ -48,9 +48,9 @@ public class TodoController {
     /*
      *    투두 삭제
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTodo(@PathVariable("id") Long id) throws CustomException {
-        todoService.deleteTodo(id);
+    @DeleteMapping("/{todoId}")
+    public ResponseEntity<?> deleteTodo(@PathVariable("todoId") Long todoId, @AuthenticationPrincipal String userId) throws CustomException {
+        todoService.deleteTodo(todoId);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 삭제 성공", null), HttpStatus.OK);
     }
 

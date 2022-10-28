@@ -24,11 +24,10 @@ public class TodoService {
      *    투두 저장
      */
     @Transactional(rollbackFor = {SQLException.class, Error.class})
-    public void postTodo(TodoDTO todoDto) throws CustomException {
+    public void postTodo(String id, TodoDTO todoDto) throws CustomException {
         try {
             TodoEntity entity = TodoDTO.toEntity(todoDto);
-            entity.changeId(null);
-            entity.changeUserId(userId);
+            entity.changeUserId(id);
             todoRepository.save(entity);
         } catch (Exception e) {
             throw new CustomException(e);
