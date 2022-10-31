@@ -9,10 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,6 +47,12 @@ public class AuthController {
     public ResponseEntity<?> reCreateToken(HttpServletRequest request, HttpServletResponse response) throws CustomException {
         authService.reCreateToken(request, response);
         return new ResponseEntity<>(new ResponseDTO<>(1, "토큰 재발급 성공", null), HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> doLogout(HttpServletRequest request, HttpServletResponse response, @CookieValue("refreshToken") String refreshToken) {
+        authService.doLogout(request, response, refreshToken);
+        return new ResponseEntity<>(new ResponseDTO<>(1, "로그아웃 성공", null), HttpStatus.OK);
     }
 
 

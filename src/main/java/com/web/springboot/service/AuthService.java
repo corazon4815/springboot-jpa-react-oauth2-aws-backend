@@ -117,5 +117,22 @@ public class AuthService {
         }
     }
 
+    public void doLogout(HttpServletRequest request, HttpServletResponse response, String refreshToken) throws CustomException {
+            Cookie accessTokenCookie = jwtProvider.getCookie(request, jwtProvider.ACCESS_TOKEN_NAME);
+            Cookie refreshTokenCookie = jwtProvider.getCookie(request, jwtProvider.REFRESH_TOKEN_NAME);
+            String id = jwtProvider.validateAndGetId(refreshToken);
+            String refreshTokenRedis = redisService.getValues(id);
+
+            if(accessTokenCookie != null) {
+                jwtProvider.createCookie(accessTokenCookie.getValue(), response, jwtProvider.ACCESS_TOKEN_NAME,0);
+            }
+            if(refreshTokenCookie != null) {
+                jwtProvider.createCookie(refreshTokenCookie.getValue(), response, jwtProvider.REFRESH_TOKEN_NAME, 0);
+            }
+            if(refreshTokenRedis != null) {
+                redisService.delValues(id);
+        }
+    }
+
     //아이디 중복 체크 메소드
 }
