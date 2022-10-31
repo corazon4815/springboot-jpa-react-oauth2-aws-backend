@@ -1,5 +1,6 @@
 package com.web.springboot.security;
 
+import com.web.springboot.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,10 +24,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private JwtProvider jwtProvider;
     private AntPathMatcher antPathMatcher;
-
+    private AuthService authService;
     private String pattern = "/auth/**/*";
 
-    public JwtAuthenticationFilter(JwtProvider jwtProvider) {
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, AuthService authService) {
+        this.authService = authService;
         this.antPathMatcher = new AntPathMatcher();
         this.jwtProvider = jwtProvider;
     }
@@ -40,10 +42,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            Cookie accessCookie = jwtProvider.getCookie(request, JwtProvider.ACCESS_TOKEN_NAME);
-            String accessToken = accessCookie.getValue();
             log.info("Filter is running...");
-            if (accessToken != null && !accessToken.equalsIgnoreCase("null")) {
+            String accessToken = null;
+
+            Cookie accessCookie = jwtProvider.getCookie(request, JwtProvider.ACCESS_TOKEN_NAME);
+            if (accessCookie != null) { //엑세스 쿠키가 있으면
+                accessToken = accessCookie.getValue();
+            } else{
+                accessToken = authService.reCreateToken(request, response); //리프레쉬 토큰이 유효하면 새로 만든 엑세스 토큰을 반환함
+            }
+
+            if (accessToken != null) {
                 // id 가져오기. 위조 된 경우 예외 처리 된다.
                 String id = jwtProvider.validateAndGetId(accessToken);
 

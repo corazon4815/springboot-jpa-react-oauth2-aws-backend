@@ -73,7 +73,7 @@ public class AuthService {
      *    토큰 재발급
      */
     @Transactional(rollbackFor = {Error.class})
-    public void reCreateToken(HttpServletRequest request, HttpServletResponse response) throws CustomException {
+    public String reCreateToken(HttpServletRequest request, HttpServletResponse response) throws CustomException {
         try {
             Cookie refreshCookie = jwtProvider.getCookie(request, jwtProvider.REFRESH_TOKEN_NAME);
             String refreshToken = refreshCookie.getValue();
@@ -88,7 +88,7 @@ public class AuthService {
                 throw new CustomException();
             }
 
-            makeToken(response, id);
+            return makeToken(response, id);
 
         } catch (Exception e) {
             throw new CustomException(e);
@@ -99,7 +99,7 @@ public class AuthService {
      *    access, refesh토큰을 생성해서 쿠키에 넣고 refresh 토큰은 redis에 넣어준다.
      */
     @Transactional(rollbackFor = {Error.class})
-    public void makeToken(HttpServletResponse response, String userId) throws CustomException {
+    public String makeToken(HttpServletResponse response, String userId) throws CustomException {
         try {
             //accessToken, refreshToken 생성
             String newAccessToken = jwtProvider.createToken(userId, jwtProvider.TOKEN_VALIDATION_SECOND);
@@ -111,6 +111,7 @@ public class AuthService {
             //쿠키에 accessToken, refreshToken 저장
             jwtProvider.createCookie(newAccessToken, response, jwtProvider.ACCESS_TOKEN_NAME, jwtProvider.TOKEN_VALIDATION_SECOND);
             jwtProvider.createCookie(newRefreshToken, response, jwtProvider.REFRESH_TOKEN_NAME, jwtProvider.REFRESH_TOKEN_VALIDATION_SECOND);
+            return newAccessToken;
         } catch (Exception e) {
             throw new CustomException(e);
         }
