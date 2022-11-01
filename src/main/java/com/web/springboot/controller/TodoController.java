@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/todo")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class TodoController {
 
@@ -21,7 +21,7 @@ public class TodoController {
     /*
      *    투두 저장
      */
-    @PostMapping
+    @PostMapping("/todo")
     public ResponseEntity<?> postTodo(@AuthenticationPrincipal String userId, @RequestBody TodoDTO todoDto) throws CustomException {
         todoService.postTodo(userId, todoDto);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 등록 성공", null), HttpStatus.OK);
@@ -30,7 +30,7 @@ public class TodoController {
     /*
      *    투두 리스트 조회
      */
-    @GetMapping
+    @GetMapping("/todo")
     public ResponseEntity<?> getTodoList(@AuthenticationPrincipal String userId) throws CustomException {
         List<TodoDTO> todoList = todoService.getTodoList(userId);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 리스트 조회 성공", todoList), HttpStatus.OK);
@@ -39,7 +39,7 @@ public class TodoController {
     /*
      *    투두 수정
      */
-    @PutMapping
+    @PutMapping("/todo")
     public ResponseEntity<?> putTodo(@RequestBody TodoDTO todoDto) throws CustomException {
         todoService.putTodo(todoDto);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 수정 성공", null), HttpStatus.OK);
@@ -48,7 +48,7 @@ public class TodoController {
     /*
      *    투두 삭제
      */
-    @DeleteMapping("/{todoId}")
+    @DeleteMapping("/todo/{todoId}")
     public ResponseEntity<?> deleteTodo(@PathVariable("todoId") Long todoId, @AuthenticationPrincipal String userId) throws CustomException {
         todoService.deleteTodo(todoId);
         return new ResponseEntity<>(new ResponseDTO<>(1, "todo 삭제 성공", null), HttpStatus.OK);
