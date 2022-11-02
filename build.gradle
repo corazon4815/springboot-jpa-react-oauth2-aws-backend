@@ -45,3 +45,22 @@ tasks.withType(Test) {
 	scanForTestClasses = false
 	include "**/*Test.class" // whatever Ant pattern matches your test class files
 }
+
+task('release') {
+	dependsOn("build")
+
+	doLast {
+		def stdout = new ByteArrayOutputStream()
+		exec {
+			commandLine 'eb', 'setenv', 'SPRING_PROFILES_ACTIVE=prod'
+			standardOutput = stdout
+		}
+		printIn "eb setenv SPRING_PROFILES_ACTIVE=prod :\n$stdout";
+		exec {
+			commandLine 'eb', 'deploy'
+			standardOutput = stdout
+		}
+		printIn "eb deploy :\n$stdout";
+		printIn "Release succeeded."
+	}
+}
